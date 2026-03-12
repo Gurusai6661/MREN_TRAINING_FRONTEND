@@ -1,6 +1,10 @@
 import "./Header.css";
 import { Link } from "react-router-dom";
+import { useContext } from "react";
+import { AppContext } from "../App";
 function Header() {
+  const { user } = useContext(AppContext);
+
   return (
     <div className="App-Header">
       <h1>My Store</h1>
@@ -8,18 +12,28 @@ function Header() {
         <li>
           <Link to="/">Home</Link>
         </li>
-        <li>
-          <Link to="/cart">Cart</Link>
-        </li>
-        <li>
-          <Link to="/orders">Order</Link>
-        </li>
-        <li>
-          <Link to="/login">Login</Link>
-        </li>
-        <li>
-          <Link to="/logout">Logout</Link>
-        </li>
+        {user?.email ? (
+          <>
+            <li>
+              <Link to="/cart">Cart</Link>
+            </li>
+            <li>
+              <Link to="/orders">Orders</Link>
+            </li>
+            <li>
+              <Link to="/logout">Logout</Link>
+            </li>
+          </>
+        ) : (
+          <>
+            <li>
+              <Link to="/login">Login</Link>
+            </li>
+            <li>
+              <Link to="/register">Register</Link>
+            </li>
+          </>
+        )}
       </ul>
     </div>
   );

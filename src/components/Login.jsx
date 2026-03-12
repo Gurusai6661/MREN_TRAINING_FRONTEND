@@ -1,32 +1,48 @@
 import { Link } from "react-router-dom";
-import { useContext } from "react";
+import { useContext, useState } from "react";
 import { AppContext } from "../App";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 function Login() {
-  const { user, setUser } = useContext(AppContext);
+  const { setUser } = useContext(AppContext);
   const API_URL = import.meta.env.VITE_API_URL;
-  const Navigate = useNavigate()
+  const navigate = useNavigate();
+  const [credentials, setCredentials] = useState({ email: "", password: "" });
+  const [error, setError] = useState("");
+
   const handleLogin = async () => {
+    setError("");
     const url = API_URL + "/auth/signin";
-    const response = await axios.post(url, user);
-    setUser(response)
-    Navigate("/")
+    try {
+      const response = await axios.post(url, credentials);
+      setUser(response.data);
+      navigate("/");
+    } catch (err) {
+      setError(err.response?.data?.message || "An error occurred during login.");
+    }
   };
+
+  const handleChange = (e) => {
+    setCredentials({ ...credentials, [e.target.name]: e.target.value });
+  };
+
   return (
     <div>
       <h2>Login Page</h2>
+      {error && <p style={{ color: "red" }}>{error}</p>}
       <p>
         <input
           type="text"
-          onChange={(e) => setUser({ ...user, email: e.target.value })}
+          name="email"
+          onChange={handleChange}
           placeholder="Email"
         />
       </p>
       <p>
         <input
           type="password"
-          onChange={(e) => setUser({ ...user, password: e.target.value })}
+          name="password"
+          onChange={handleChange}
           placeholder="Password"
         />
       </p>
