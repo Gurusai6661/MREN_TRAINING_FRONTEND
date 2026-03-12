@@ -1,38 +1,60 @@
-import { useContext } from "react";
+import { useContext, useState, useEffect } from "react";
 import { AppContext } from "../App";
-import { useNavigate } from "react-router-dom";
-
 function Cart() {
   const { cart, setCart } = useContext(AppContext);
-  const navigate = useNavigate();
-  const API_URL = import.meta.env.VITE_API_URL;
-
-  const handleRemove = (index) => {
-    const newCart = [...cart];
-    newCart.splice(index, 1);
-    setCart(newCart);
+  const [orderValue, setOrderValue] = useState(0);
+  const increment = (id) => {
+    setCart(
+      cart.map((item) => {
+        if (item._id === id) {
+          return { ...item, quantity: item.quantity + 1 };
+        } else {
+          return item;
+        }
+      }),
+    );
+  };
+  const decrement = (id) => {
+    setCart(
+      cart.map((item) => {
+        if (item._id === id && item.quantity > 0) {
+          return { ...item, quantity: item.quantity - 1 };
+        } else {
+          return item;
+        }
+      }),
+    );
   };
 
+  useEffect(() => {
+    setOrderValue(
+      cart.reduce((sum, item) => {
+        return sum + item.quantity * item.price;
+      }, 0),
+    );
+  }, [cart]);
+
   return (
-    <div style={{ padding: "20px" }}>
+    <div>
       <h1>My Cart</h1>
-      {cart.length === 0 ? (
-        <p>Your cart is empty. <button onClick={() => navigate("/")}>Go Home</button></p>
-      ) : (
-        <div>
-          {cart.map((item, index) => (
-            <div key={index} style={{ border: "1px solid #ccc", padding: "10px", marginBottom: "10px", display: "flex", alignItems: "center", gap: "20px" }}>
-              <img src={`${API_URL}/${item.imageUrl}`} width="80" alt={item.name} />
-              <div>
-                <h3>{item.name}</h3>
-                <p>Price: {item.price}</p>
-                <button onClick={() => handleRemove(index)} style={{ backgroundColor: "red", color: "white" }}>Remove</button>
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
+      <ol>
+        {cart.map((item) => (
+          <li key={item._id}>
+            {item.name}-{item.price}-
+            <button onClick={() => decrement(item._id)}>-</button>
+            {item.quantity}
+            <button onClick={() => increment(item._id)}>+</button>-
+            {item.quantity * item.price}
+          </li>
+        ))}
+      </ol>
+      <p>
+        <strong>Order Value:{orderValue}</strong>
+      </p>
+      <p>
+        <button>Place Order</button>
+      </p>
     </div>
   );
 }
-export default Cart
+export default Cart;
