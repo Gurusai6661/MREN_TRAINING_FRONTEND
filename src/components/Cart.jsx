@@ -1,5 +1,6 @@
 import { useContext, useState, useEffect } from "react";
 import { AppContext } from "../App";
+
 function Cart() {
   const { cart, setCart } = useContext(AppContext);
   const [orderValue, setOrderValue] = useState(0);
@@ -57,4 +58,4 @@ function Cart() {
     </div>
   );
 }
-export default Cart;
+export default Cart
